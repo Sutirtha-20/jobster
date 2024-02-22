@@ -10,6 +10,7 @@ import { addUserToLocalStorage, getUserFromLocalStorage, removeUserFromLocalStor
 
 const initialState = {
     isLoading: false,
+    isSidebarOpen: false,
     user: getUserFromLocalStorage()
 }
 
@@ -39,15 +40,39 @@ export const registerUser = createAsyncThunk(
         return thunkAPI.rejectWithValue(error.response.data.msg)
       }
   
-
   });
+
+  export const updateUser = createAsyncThunk(
+    'user/updateUser',
+    async (user, thunkAPI) => {
+      try {
+        const resp = await customFetch.patch('/auth/updateUser', user, {
+          headers: {
+            authorization: `Bearer ${thunkAPI.getState().user.user.token}`,   //thunkAPI.getState().slicename.propertyname.token
+          },
+        });
+        return resp.data;
+      } catch (error) {
+        console.log(error.response);
+        return thunkAPI.rejectWithValue(error.response.data.msg);
+      }
+    }
+  );
 
 
 const userSlice = createSlice({
     name: 'user',
     initialState,
-
-
+    reducers:{
+      toggleSidebar: (state) => {
+        state.isSidebarOpen = !state.isSidebarOpen;
+      },
+      logoutUser: (state) => {
+        state.user = null;
+        state.isSidebarOpen = false;
+        removeUserFromLocalStorage();
+      } 
+    },
     //extrareducers are created to handle the promise which is created by the http call done by createasyncthunk 
     // http call has 3 lifecycle methods below is the case which will happen
     extraReducers: {
@@ -80,8 +105,24 @@ const userSlice = createSlice({
       [loginUser.rejected]: (state, action) => {
         state.isLoading = false;
         toast.error(action.payload);
-      }
+      },
+      [updateUser.pending]: (state) => {
+        state.isLoading = true;
+      },
+      [updateUser.fulfilled]: (state, action) => {     //action objec conatins payload and type
+        const { user } = action.payload;
+        state.isLoading = false;
+        state.user = user;
+  
+        addUserToLocalStorage(user);
+        toast.success('User Updated');
+      },
+      [updateUser.rejected]: (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload);
+      },
     }
 })
 
-export default userSlice.reducer;
+export const {toggleSidebar, logoutUser} = userSlice.actions;   //this provides access to components allowing dispatch func
+export default userSlice.reducer;  //this provides access to the redux store
