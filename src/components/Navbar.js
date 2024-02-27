@@ -27,7 +27,7 @@ function Navbar() {
           <FaAlignLeft/></button>
           <div>
             <Logo/>
-            <div className="logo-text">Dashboard</div>
+            {/* <div className="logo-text">Dashboard</div> */}
           </div>
           <div className="btn-container">
             <button type='button' className='btn' onClick={() => setShowLogout(!showLogout)}>

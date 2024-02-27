@@ -8,7 +8,7 @@ function FormRow(props) {
             {labelText || name}
           </label>
           
-          <input type={type} name={name} value={value} onChange={handleChange} 
+          <input id={name} type={type} name={name} value={value} onChange={handleChange} 
           className='form-input'/>
     </div>
   )
