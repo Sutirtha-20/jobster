@@ -18,7 +18,7 @@ function Navbar() {
   }
   
   const logout = () => {
-    dispatch(logoutUser())
+    dispatch(logoutUser('logged out...'))
   }
   return (
     <Wrapper>

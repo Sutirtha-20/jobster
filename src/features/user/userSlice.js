@@ -70,10 +70,13 @@ const userSlice = createSlice({
       toggleSidebar: (state) => {
         state.isSidebarOpen = !state.isSidebarOpen;
       },
-      logoutUser: (state) => {
+      logoutUser: (state,action) => {
+        const {payload} = action;
         state.user = null;
         state.isSidebarOpen = false;
-        toast.success("logout successful");
+        if(payload){
+          toast.success(payload);
+        }
         removeUserFromLocalStorage();
       } 
     },
