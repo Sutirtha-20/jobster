@@ -76,7 +76,11 @@ function Register() {
         handleChange={handleChange} labeltext="password"/>
 
         <button className="btn btn-block" type='submit' disabled={isLoading}>{isLoading ? 'loading..' : 'submit'}</button>
-      
+        <button className="btn btn-block btn-hipster" type='submit' disabled={isLoading}
+        onClick={()=> dispatch(
+          loginUser({email:'testUser@test.com',password:'secret'})
+          )}>
+            {isLoading ? 'loading..' : 'demo'}</button>
         <p>{!values.isMember ? "Already a member" : "Not a member yet?"}
         <span>
           <button className='member-btn' onClick={toggleMember} type='button'>

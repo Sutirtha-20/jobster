@@ -41,6 +41,24 @@ const initialFiltersState = {    //search parmeter initial values
     }
   )
 
+  export const showStats = createAsyncThunk(
+    'allJobs/showStats',
+    async (_, thunkAPI) => {
+      try {
+        const resp = await customFetch.get('/jobs/stats',{
+          headers:{
+            authorization: `Bearer ${thunkAPI.getState().user.user.token}`,
+          }
+        });
+        console.log(resp.data);
+        return resp.data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(error.response.data.msg);
+      }
+    }
+  )
+  
+
 const allJobsSlice = createSlice({
     name: 'allJobs',
     initialState,
@@ -50,6 +68,13 @@ const allJobsSlice = createSlice({
       },
       hideLoading: (state) => {
         state.isLoading = false;
+      },
+      handleChange: (state, { payload: { name, value } }) => {
+        // state.page = 1;
+        state[name] = value;
+      },
+      clearFilters: (state) => {
+        return { ...state, ...initialFiltersState };
       },
     },
     extraReducers:{
@@ -64,8 +89,20 @@ const allJobsSlice = createSlice({
             state.isLoading = false;
             toast.error(payload);
           },
+          [showStats.pending]: (state) => {
+            state.isLoading = true;
+          },
+          [showStats.fulfilled]: (state, { payload }) => {
+            state.isLoading = false;
+            state.stats = payload.defaultStats;
+            state.monthlyApplications = payload.monthlyApplications;
+          },
+          [showStats.rejected]: (state, { payload }) => {
+            state.isLoading = false;
+            toast.error(payload);
+          },
     }
 })
 
-export const {showLoading,hideLoading} = allJobsSlice.actions;
+export const {showLoading,hideLoading,handleChange,clearFilters} = allJobsSlice.actions;
 export default allJobsSlice.reducer;
